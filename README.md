@@ -1,2 +1,2 @@
-# Lessons
+# web lessons
 For a rubyschool
