@@ -4,6 +4,19 @@ require 'sinatra'
 require 'sinatra/reloader'
 require 'sqlite3'
 
+configure do
+	@db = SQLite3::Database.new "Users.db"
+	@db.execute 'CREATE TABLE IF NOT EXISTS
+		"Users"
+		(
+			"id" INTEGER PRIMARY KEY AUTOINCREMENT,
+			"username" TEXT,
+			"userphone" TEXT,
+			"dsatestamp" TEXT,
+			"barber" TEXT
+		)'
+end
+
 get '/' do
 	erb "Hello! <a href=\"https://github.com/bootstrap-ruby/sinatra-bootstrap\">Original</a> pattern has been modified for <a href=\"http://rubyschool.us/\">Ruby School</a>"			
 end
@@ -21,7 +34,6 @@ post '/visit' do
 	@userphone = params[:userphone]
 	@datetime = params[:datetime]
 	@barber = params[:barber]
-	db = SQlite3::Database.new 'users.sqlite'
 
 	hh = {  :username => 'Введите имя', 
 			:userphone => 'Введите номер телефона', 
@@ -49,7 +61,7 @@ post '/visit' do
 #	f = File.open './public/users.txt', 'a'
 #	f.write "User: #{@username}, phone: #{@userphone}, date & time: #{@datetime}, barber: #{@barber}\n"
 #	f.close
-	db.execute 'Insert into Users (Name, Phone, DateStamp, Barber) values (?, ?, ?, ?)', [@username, @userphone, @datetime, @barber]
+#	db.execute 'Insert into Users (Name, Phone, DateStamp, Barber) values (?, ?, ?, ?)', [@username, @userphone, @datetime, @barber]
 	erb "Уважаемый #{@username}, ждем Вас #{@datetime}"
 end
 
