@@ -2,6 +2,7 @@
 require 'rubygems'
 require 'sinatra'
 require 'sinatra/reloader'
+require 'sqlite3'
 
 get '/' do
 	erb "Hello! <a href=\"https://github.com/bootstrap-ruby/sinatra-bootstrap\">Original</a> pattern has been modified for <a href=\"http://rubyschool.us/\">Ruby School</a>"			
@@ -20,15 +21,19 @@ post '/visit' do
 	@userphone = params[:userphone]
 	@datetime = params[:datetime]
 	@barber = params[:barber]
+	db = SQlite3::Database.new 'users.sqlite'
 
 	hh = {  :username => 'Введите имя', 
 			:userphone => 'Введите номер телефона', 
 			:datetime => 'Введите дату и время'	}
-	hh.each do |key, value|
-		if params[key] == ''
-			@error = hh[key]
-			return erb :visit
-		end
+	@error = hh.select {|key,_| params[key] == ''}.values.join(", ")
+	if @error != ''
+  		return erb :visit
+#	hh.each do |key, value|
+#		if params[key] == ''
+#			@error = hh[key]
+#			return erb :visit
+#		end
 	end
 #	if @username == ''
 #		@error = 'Введите имя'
@@ -41,9 +46,10 @@ post '/visit' do
 #	end
 #	if @error != ''
 #		erb :visit
-	f = File.open './public/users.txt', 'a'
-	f.write "User: #{@username}, phone: #{@userphone}, date & time: #{@datetime}, barber: #{@barber}\n"
-	f.close
+#	f = File.open './public/users.txt', 'a'
+#	f.write "User: #{@username}, phone: #{@userphone}, date & time: #{@datetime}, barber: #{@barber}\n"
+#	f.close
+	db.execute 'Insert into Users (Name, Phone, DateStamp, Barber) values (?, ?, ?, ?)', [@username, @userphone, @datetime, @barber]
 	erb "Уважаемый #{@username}, ждем Вас #{@datetime}"
 end
 
@@ -61,8 +67,8 @@ post '/user' do
 
   # проверим логин и пароль, и пускаем внутрь или нет:
   if @login == 'admin' && @password == 'p@ss'
-    @file = File.open("./public/users.txt","r")
-    erb :watch_result
+#    @file = File.open("./public/users.txt","r")
+#    erb :watch_result
     # @file.close - должно быть, но тогда не работает. указал в erb
   else
     @report = '<p>Доступ запрещён! Неправильный логин или пароль.</p>'
