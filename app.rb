@@ -5,16 +5,22 @@ require 'sinatra/reloader'
 require 'sqlite3'
 
 configure do
-	@db = SQLite3::Database.new "Users.db"
-	@db.execute 'CREATE TABLE IF NOT EXISTS
+	db = get_db
+	db.execute 'CREATE TABLE IF NOT EXISTS
 		"Users"
 		(
 			"id" INTEGER PRIMARY KEY AUTOINCREMENT,
 			"username" TEXT,
 			"userphone" TEXT,
-			"dsatestamp" TEXT,
+			"datestamp" TEXT,
 			"barber" TEXT
 		)'
+end
+
+def get_db
+	db = SQLite3::Database.new 'Users.db'
+	db.results_as_hash = true
+	return db
 end
 
 get '/' do
@@ -61,7 +67,8 @@ post '/visit' do
 #	f = File.open './public/users.txt', 'a'
 #	f.write "User: #{@username}, phone: #{@userphone}, date & time: #{@datetime}, barber: #{@barber}\n"
 #	f.close
-#	db.execute 'Insert into Users (Name, Phone, DateStamp, Barber) values (?, ?, ?, ?)', [@username, @userphone, @datetime, @barber]
+	db = get_db
+	db.execute 'INSERT INTO "Users" (username, userphone, datestamp, barber) values (?, ?, ?, ?)', [@username, @userphone, @datetime, @barber]
 	erb "Уважаемый #{@username}, ждем Вас #{@datetime}"
 end
 
