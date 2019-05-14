@@ -1,6 +1,19 @@
 <h2>Записаться</h2>
 <p>на этой странице Вы сможете записаться на прием</p>
 
+<script type="text/javascript">
+   $(function(){
+     $('#datetimepicker').datetimepicker({
+        format:'d.m.Y H:i',
+        step: 30,
+        minTime: '10:00',
+        maxTime: '20:30',
+        dayOfWeekStart: 1
+      });
+     $.datetimepicker.setLocale('ru');
+   });
+</script>
+
 <form action="/visit" method="POST" role="form">
   
   <div class="form-group">
@@ -25,7 +38,7 @@
 
   <div class="form-group">
     <label>Когда Вас ждать?</label>
-    <input name="datetime" type="text" class="form-control" placeholder="Введите дату и время" value="<%= @datetime %>">
+    <input id="datetimepicker" autocomplete="off" name="datetime" type="text" class="form-control" placeholder="Введите дату и время" value="<%= @datetime %>">
   </div>
 
   <button type="submit" class="btn btn-primary">Записаться</button>

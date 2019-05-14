@@ -1,10 +1,25 @@
 <h2>Admin Panel (Watch Result)</h2>
 
 
-<table border="1">
-<% @file.each_line do |line| %>
-  <tr><td><%= line %></td></tr>
-<% end %>
-</table>
+<table class="table table-striped">
+	<thead>
+		<tr>
+			<th>Имя</th>
+			<th>Телефон</th>
+			<th>Дата записи</th>
+			<th>Парикмахер</th>
+		</tr>
+	</thead>
 
-<%= @file.close %>
+	<tbody>
+		<% @results.each do |row| %>
+			<tr>
+				<td><%= row['username'] %></td>
+				<td><%= row['userphone'] %></td>
+				<td><%= row['datestamp'] %></td>
+				<td><%= row['barber'] %></td>
+			</tr>
+		<% end %>
+	</tbody>
+
+</table>

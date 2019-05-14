@@ -4,6 +4,13 @@ require 'sinatra'
 require 'sinatra/reloader'
 require 'sqlite3'
 
+
+def get_db
+	db = SQLite3::Database.new 'Users.db'
+	db.results_as_hash = true
+	return db
+end
+
 configure do
 	db = get_db
 	db.execute 'CREATE TABLE IF NOT EXISTS
@@ -15,12 +22,12 @@ configure do
 			"datestamp" TEXT,
 			"barber" TEXT
 		)'
-end
-
-def get_db
-	db = SQLite3::Database.new 'Users.db'
-	db.results_as_hash = true
-	return db
+		db.execute 'CREATE TABLE IF NOT EXISTS
+		"Barbers"
+		(
+			"id" INTEGER PRIMARY KEY AUTOINCREMENT,
+			"name" TEXT
+		)'
 end
 
 get '/' do
@@ -47,26 +54,8 @@ post '/visit' do
 	@error = hh.select {|key,_| params[key] == ''}.values.join(", ")
 	if @error != ''
   		return erb :visit
-#	hh.each do |key, value|
-#		if params[key] == ''
-#			@error = hh[key]
-#			return erb :visit
-#		end
 	end
-#	if @username == ''
-#		@error = 'Введите имя'
-#	end
-#	if @userphone == ''
-#		@error = 'Введите номер телефона'
-#	end
-#	if @datetime == ''
-#		@error = 'Введите дату и время'
-#	end
-#	if @error != ''
-#		erb :visit
-#	f = File.open './public/users.txt', 'a'
-#	f.write "User: #{@username}, phone: #{@userphone}, date & time: #{@datetime}, barber: #{@barber}\n"
-#	f.close
+
 	db = get_db
 	db.execute 'INSERT INTO "Users" (username, userphone, datestamp, barber) values (?, ?, ?, ?)', [@username, @userphone, @datetime, @barber]
 	erb "Уважаемый #{@username}, ждем Вас #{@datetime}"
@@ -80,15 +69,19 @@ get '/user' do
   erb :user
 end
 
+get '/showusers' do
+  
+end
+
 post '/user' do
   @login = params[:login]
   @password = params[:password]
 
   # проверим логин и пароль, и пускаем внутрь или нет:
   if @login == 'admin' && @password == 'p@ss'
-#    @file = File.open("./public/users.txt","r")
-#    erb :watch_result
-    # @file.close - должно быть, но тогда не работает. указал в erb
+ 	db = get_db
+ 	@results = db.execute 'select * from Users order by id desc'
+  	erb :watch_result
   else
     @report = '<p>Доступ запрещён! Неправильный логин или пароль.</p>'
     erb :user
